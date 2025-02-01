@@ -13,25 +13,26 @@ jobs:
     - uses: actions/checkout@v2
     - name: Create Compile Folder
       run: |
-        &mkdir ./compile
-    - name: Setup MinGW
-      id: setup
-      uses: egor-tensin/setup-mingw@v2
+        mkdir ./compile
+    - name: Install MSYS2
+      uses: msys2/setup-msys2@v2
       with:
-        platform: x64
-        cc: 1
-    - name : Check version
+        update: true
+        install: >-
+          mingw-w64-x86_64-gcc
+          mingw-w64-x86_64-g++
+    - name: Check version
       run: |
-        & '${{ steps.setup.outputs.gxx }}' --version
+        gcc --version
     - name: Setting Date Variable
       id: date
-      run: echo "::set-output name=today::$(date +'%d%m%y-%H%M%S')"
-    - name : Build main.cpp
+      run: echo "today=$(date +'%d%m%y-%H%M%S')" >> $GITHUB_ENV
+    - name: Build main.cpp
       run: |
-       & '${{ steps.setup.outputs.gxx }}' -Wall -Wextra -o ./compile/result_${{ steps.date.outputs.today }} ./src/main.cpp -std=c++98 -static
-    - name : Upload Artifact 
-      uses : actions/upload-artifact@v2.3.1
+        g++ -Wall -Wextra -o ./compile/result_${{ env.today }} ./src/main.cpp -std=c++98 -static
+    - name: Upload Artifact 
+      uses: actions/upload-artifact@v2.3.1
       with:
-          name: RentalMobil_${{ steps.date.outputs.today }}
-          path: ./compile/
-          retention-days: 2
+        name: RentalMobil_${{ env.today }}
+        path: ./compile/
+        retention-days: 2
