@@ -9,7 +9,7 @@ jobs:
         shell: pwsh
     
     steps:
-    - uses: actions/checkout@v4.2.2
+    - uses: actions/checkout@v3
     
     - name: Create Compile Folder
       run: |
@@ -21,7 +21,6 @@ jobs:
         update: true
         install: >-
           mingw-w64-x86_64-gcc
-          mingw-w64-x86_64-g++
 
     - name: Add MinGW to PATH
       run: echo "C:\msys64\mingw64\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
@@ -39,8 +38,8 @@ jobs:
         g++ -Wall -Wextra -o ./compile/result_${{ env.today }} ./src/main.cpp -std=c++98 -static
 
     - name: Upload Artifact 
-      uses: actions/upload-artifact@v4.6.0
+      uses: actions/upload-artifact@v3
       with:
         name: RentalMobil_${{ env.today }}
         path: ./compile/
-        retention-days: 2
+        retention-days: 30
