@@ -1,19 +1,20 @@
 name: Build 64Bit
-
 on: [push, pull_request]
 
 jobs:
-
   MIN-GW:
     runs-on: windows-latest
     defaults:
       run:
         shell: pwsh
+    
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
+    
     - name: Create Compile Folder
       run: |
         mkdir ./compile
+
     - name: Install MSYS2
       uses: msys2/setup-msys2@v2
       with:
@@ -21,17 +22,24 @@ jobs:
         install: >-
           mingw-w64-x86_64-gcc
           mingw-w64-x86_64-g++
+
+    - name: Add MinGW to PATH
+      run: echo "C:\msys64\mingw64\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
     - name: Check version
       run: |
         gcc --version
+
     - name: Setting Date Variable
       id: date
-      run: echo "today=$(date +'%d%m%y-%H%M%S')" >> $GITHUB_ENV
+      run: echo "today=$((Get-Date).ToString('ddMMyy-HHmmss'))" >> $env:GITHUB_ENV
+
     - name: Build main.cpp
       run: |
         g++ -Wall -Wextra -o ./compile/result_${{ env.today }} ./src/main.cpp -std=c++98 -static
+
     - name: Upload Artifact 
-      uses: actions/upload-artifact@v2.3.1
+      uses: actions/upload-artifact@v3
       with:
         name: RentalMobil_${{ env.today }}
         path: ./compile/
